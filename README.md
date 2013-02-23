@@ -1,25 +1,25 @@
 how to install you some openstack:
 ==================================
 
-# Chapter 1: the repo is cloned
+#### Chapter 1: the repo is cloned
 ```bash
 git clone git@github.com/echohead/dbaas_cloud.git
 ```
 
-# Chapter 2: an environment is born
+#### Chapter 2: an environment is born
 ```bash
 cp envs/localhost.json envs/my_env.json
 vi envs/my_env.json
 # add your ips, passwords, etc.
 ```
 
-# Chapter 3: a node asumes control
+#### Chapter 3: a node asumes control
 ```bash
 # on controller host:
 bin/install-controller envs/my_env.json
 ```
 
-# Chapter 4: rise of the machines
+#### Chapter 4: rise of the machines
 ```bash
 # on compute host:
 bin/install-compute envs/my_env.json
