@@ -21,7 +21,7 @@ bin/install-controller envs/my_env.json
 
 #### Chapter 4: rise of the machines
 ```bash
-# on compute host:
+# on compute N hosts:
 bin/install-compute envs/my_env.json
 ```
 
