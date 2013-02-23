@@ -1,0 +1,23 @@
+#!/bin/bash
+set -eux
+source $(dirname $0)/../lib/functions
+
+if [ $# -ne 1 ]; then
+  echo "usage: install_controller <config_path>"
+  exit 1
+fi
+
+export OS_CONFIG=$1
+
+common_deps
+db
+rabbit
+keystone
+glance
+cinder
+nova_except_compute
+
+$(dirname $0)/reset-db
+$(dirname $0)/reset-services
+$(dirname $0)/reset-keystone
+$(dirname $0)/reset-nova

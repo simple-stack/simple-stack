@@ -1,0 +1,46 @@
+{
+  "admin-token": "foobar",
+  "service-password": "foobaz",
+  "admin-password": "kilgore",
+  "interfaces": {
+    "control": "eth0",
+    "public": "eth0"
+  },
+  "database": {
+    "password": "stackdb"
+  },
+  "openstack": {
+    "public_address":   "127.0.0.1",
+    "admin_address":    "127.0.0.1",
+    "internal_address": "127.0.0.1"
+  },
+  "keystone": {
+    "host": "127.0.0.1",
+    "db": "mysql://keystone:stackdb@localhost/keystone"
+  },
+  "rabbit": {
+    "host": "127.0.0.1",
+    "password": "guest"
+  },
+  "glance": {
+    "host": "127.0.0.1",
+    "db": "mysql://glance:stackdb@localhost/glance"
+  },
+  "nova": {
+    "host": "127.0.0.1",
+    "db":    "mysql://nova:stackdb@localhost/nova",
+    "libvirt_type": "qemu",
+    "network": {
+      "floating": "15.125.16.100/26",
+      "private":  "10.0.0.0/24",
+      "public_interface": "eth0"
+    }
+  },
+  "cinder": {
+    "db": "mysql://cinder:stackdb@localhost/cinder"
+  },
+  "quantum": {
+    "host": "127.0.0.1",
+    "ovs_db": "mysql://quantum:stackdb@localhost/ovs_quantum?charset=utf8"
+  }
+}

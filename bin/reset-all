@@ -1,0 +1,8 @@
+#!/bin/bash
+set -eu
+d=$(dirname $0)
+
+$d/reset-db
+$d/reset-services
+$d/reset-keystone
+$d/reset-nova

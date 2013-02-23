@@ -1,0 +1,77 @@
+#!/bin/bash
+set -eux
+
+os-config-applier --templates $(dirname $0)/../config
+
+if [ -e /etc/init.d/rabbitmq-server]; then
+  service rabbitmq-server restart
+  # TODO: get pw from config
+  #rabbitmqctl change_password guest stackqueue
+fi
+
+if [ -e /etc/init/keystone.conf ]; then
+  keystone-manage pki_setup
+  chown -R keystone:keystone /etc/keystone/ssl
+  service keystone restart
+fi
+
+if [ -e /etc/init/glance-api.conf ]; then
+  service glance-api restart
+  service glance-reg restart
+fi
+
+if [ -e /etc/init/cinder-api.conf ]; then
+  sed -i 's/false/true/g' /etc/default/iscsitarget
+  vol_group=cinder-volumes
+  vol_file=/var/run/cinder/$vol_group-backing-file
+  size=5000M
+
+  if ! vgs $vol_group; then
+    [[ -f $vol_file ]] || truncate -s $size $vol_file
+    dev=`sudo losetup -f --show $vol_file`
+    if ! vgs $vol_group; then vgcreate $vol_group $dev; fi
+    mkdir -p /var/run/cinder/volumes
+  fi
+
+  service iscsitarget start
+  service open-iscsi start
+  service cinder-api restart
+  service cinder-volume restart
+  service cinder-scheduler restart
+fi
+
+
+function restart_if_exists {
+  if [ -e /etc/init/$1.conf ]; then service $1 restart; fi
+}
+
+
+# ufw can cause obscure problems
+ufw disable
+
+# cirros image won't do dhcp without this:
+iptables -A POSTROUTING -t mangle -p udp --dport 68 -j CHECKSUM --checksum-fill
+
+if [ -e /dev/kvm ]; then
+  chown root:kvm /dev/kvm
+fi
+
+# TODO: hack - should fix this right
+chown -R nova:nova /var/log/nova
+
+restart_if_exists nova-conductor
+restart_if_exists nova-api
+restart_if_exists nova-cert
+restart_if_exists nova-rpc-zmq-receiver
+restart_if_exists nova-scheduler
+restart_if_exists nova-consoleauth
+restart_if_exists nova-compute
+restart_if_exists nova-network
+
+modprobe nbd || true
+
+
+# TODO: for compute nodes only
+mkdir -p /var/run/nova/instances
+chown -R nova:nova /var/run/nova
+

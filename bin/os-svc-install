@@ -1,0 +1,55 @@
+#!/bin/bash
+set -eux
+
+function install-os-service() {
+  local name=$1
+  local user=$2
+  local repo=$3
+  local branch=$4
+
+  id $user || useradd $user --system -d /var/run/$user -s /bin/false
+
+  for d in /var/log/$user /var/run/$user /etc/$user; do
+    mkdir -p $d
+    chown -R $name:$name $d
+  done
+
+  local svc_root=/opt/stack/$user
+  if [ ! -e $svc_root ]; then
+    git clone --depth=1 -b $branch $repo $svc_root
+    pip install -U $svc_root
+  fi
+}
+
+
+function usage() {
+  echo "options:"
+  echo "  -h   show usage and exit"
+  echo "  -r   service's git repo url"
+  echo "  -b   repo branch or ref (default 'master')"
+  echo "  -n   service name"
+  echo "  -u   name of the service run-as user"
+  exit 0
+}
+
+while getopts r:u:c:n:h:b: opt; do
+  case "$opt" in
+    u)  user=$OPTARG;;
+    h)  usage;;
+    r)  repo=$OPTARG;;
+    b)  branch=$OPTARG;;
+    n)  name=$OPTARG;;
+    \?) usage;;
+  esac
+done
+
+branch=${branch:-master}
+
+if [[ -z "$user" || -z "$repo" || -z "$name" ]]; then
+  echo "missing required parameter"
+  exit 1
+fi
+
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python-dev python-pip git-core python-setuptools gcc libc6-dev libxml2-dev libxslt-dev
+install-os-service "$name" "$user" "$repo" "$branch"
