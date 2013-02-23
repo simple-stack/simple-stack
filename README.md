@@ -1,6 +1,12 @@
 how to install you some openstack:
 ==================================
 
+#### Preface: in the beginning was quantal
+
+```
+see preface
+```
+
 #### Chapter 1: the repo is cloned
 ```bash
 git clone git@github.com/echohead/dbaas_cloud.git
