@@ -25,6 +25,9 @@ exec start-stop-daemon --start \\
                        --make-pidfile --pidfile /var/run/$user/$name.pid \\
                        --exec $cmd -- $args >> /var/log/$user/$name.log 2>&1
 EOF
+
+# Create symbolic link for /etc/init.d/$name for compatability
+ln -sf /lib/init/upstart-job /etc/init.d/$name
 }
 
 if [ $# -lt 4 ]; then
