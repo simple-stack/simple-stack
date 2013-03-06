@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eux
 
+pypi_mirror=http://pypi.openstack.org/
+pip_install="pip install -i $pypi_mirror "
+
 function install-os-service() {
   local name=$1
   local user=$2
@@ -17,7 +20,8 @@ function install-os-service() {
   local svc_root=/opt/stack/$user
   if [ ! -e $svc_root ]; then
     git clone --depth=1 -b $branch $repo $svc_root
-    pip install -U $svc_root
+    [ -e $svc_root/tools/pip-requires ] && $pip_install -r $svc_root/tools/pip-requires
+    $pip_install $svc_root
   fi
 }
 
