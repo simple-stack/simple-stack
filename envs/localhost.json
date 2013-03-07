@@ -32,6 +32,7 @@
     "libvirt_type": "qemu",
     "network": {
       "floating": "15.125.16.100/26",
+      "routing_source": "15.125.16.1",
       "private":  "10.0.0.0/24",
       "public_interface": "eth0",
       "my_ip": "TBD by install script"
