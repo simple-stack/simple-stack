@@ -59,6 +59,12 @@ fi
 # TODO: hack - should fix this right
 chown -R nova:nova /var/log/nova
 
+# TODO: for compute nodes only
+mkdir -p /var/lib/nova/instances
+chown -R nova:nova /var/lib/nova
+
+modprobe nbd || true
+
 restart_if_exists nova-conductor
 restart_if_exists nova-api
 restart_if_exists nova-cert
@@ -67,11 +73,3 @@ restart_if_exists nova-scheduler
 restart_if_exists nova-consoleauth
 restart_if_exists nova-compute
 restart_if_exists nova-network
-
-modprobe nbd || true
-
-
-# TODO: for compute nodes only
-mkdir -p /var/lib/nova/instances
-chown -R nova:nova /var/lib/nova
-

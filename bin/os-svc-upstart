@@ -12,6 +12,11 @@ function install_upstart {
 start on filesystem and net-device-up IFACE!=lo
 stop on runlevel [016]
 
+pre-start script
+  mkdir -p /var/run/$user
+  chown -R $user:$user /var/run/$user
+end script
+
 respawn
 
 exec sudo -u $user $cmd $args
