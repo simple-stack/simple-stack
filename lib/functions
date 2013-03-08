@@ -74,7 +74,7 @@ function cinder {
   os-svc-upstart cinder-scheduler cinder /usr/local/bin/cinder-scheduler "--config-dir /etc/cinder"
   mkdir -p /etc/tgt/conf.d
   echo 'include /etc/tgt/conf.d/cinder_tgt.conf' > /etc/tgt/targets.conf
-  echo 'include /var/run/cinder/volumes/*' > /etc/tgt/conf.d/cinder_tgt.conf
+  echo 'include /var/lib/cinder/volumes/*' > /etc/tgt/conf.d/cinder_tgt.conf
 
   install-packages linux-headers-`uname -r`
   install-packages iscsitarget iscsitarget-dkms
@@ -99,7 +99,7 @@ function nova_common {
   install-packages libvirt-bin python-libvirt kvm pm-utils
   usermod -a -G libvirtd nova
   give_sudo nova
-  mkdir -p /var/run/nova/keys && chown -R nova:nova /var/run/nova/keys
+  mkdir -p /var/lib/nova/keys && chown -R nova:nova /var/lib/nova/keys
   chown -R nova:nova /var/lib/misc/
   os-svc-upstart nova-network          nova /usr/local/bin/nova-network          "--config-dir /etc/nova"
 }
