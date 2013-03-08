@@ -3,11 +3,19 @@ set -eux
 
 source $(dirname $0)/../stackrc
 
-if [ ! -e /root/cirros.qcow2 ]; then
-  curl -L -o /root/cirros.qcow2 "https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img"
-fi
+function install_image {
+  local name=$1
+  local url=$2
 
-glance add name=cirros is_public=True protected=True disk_format=qcow2 container_format=bare < /root/cirros.qcow2
+  if [ ! -e /root/$name.qcow2 ]; then
+    curl -L -o /root/$name.qcow2 "$url"
+  fi
+
+  glance add name=$name is_public=True protected=True disk_format=qcow2 container_format=bare < /root/$name.qcow2
+}
+
+install_image cirros  "https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img"
+install_image quantal "http://cloud-images.ubuntu.com/quantal/current/quantal-server-cloudimg-amd64-disk1.img"
 
 #nova-manage network create private 192.168.122.100/27 1 20
 nova-manage floating create $(os-config-applier --key nova.network.floating) --pool=nova
