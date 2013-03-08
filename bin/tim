@@ -1,5 +1,0 @@
-#!/bin/bash
-set -eux
-
-curl 'https://raw.github.com/echohead/chef/master/cookbooks/tmux/files/default/.tmux.conf' | sudo tee /etc/tmux.conf
-

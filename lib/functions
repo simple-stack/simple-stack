@@ -145,7 +145,7 @@ function common_deps {
   drop_heat_data
   install_scripts
   apt-get update
-  install-packages git ipmitool python-dev python-pip python-greenlet python-mysqldb screen ccze libxml2-dev libxslt-dev python-zmq
+  install-packages git ipmitool python-dev python-pip python-greenlet python-mysqldb screen cowsay ccze libxml2-dev libxslt-dev python-zmq
   install-packages openvswitch-common openvswitch-controller openvswitch-switch open-iscsi
   install-packages python-numpy python-lxml
   pip install -U git+https://github.com/echohead/os-config-applier.git

@@ -1,0 +1,33 @@
+#!/bin/bash
+# disable all openstack services on this host, and reboot.
+set -eu
+
+
+function disable {
+  sudo rm -rf \
+    /etc/init/keystone* \
+    /etc/init.d/keystone* \
+    /etc/init/nova* \
+    /etc/init.d/nova* \
+    /etc/init/glance* \
+    /etc/init.d/glance* \
+    /etc/init/cinder* \
+    /etc/init.d/cinder*
+
+  sudo shutdown -r now
+}
+
+
+cowsay -f flaming-sheep <<EOF
+This will forcefully disable all openstack services
+on this machine and reboot!!!
+
+Are you sure? (y/n)
+EOF
+
+read -p "Continue (y/n)?" choice
+case "$choice" in
+  y|Y ) disable;;
+  n|N ) echo "chicken...";;
+  * ) echo "invalid - aborting";;
+esac
