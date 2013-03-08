@@ -23,14 +23,14 @@ fi
 if [ -e /etc/init/cinder-api.conf ]; then
   sed -i 's/false/true/g' /etc/default/iscsitarget
   vol_group=cinder-volumes
-  vol_file=/var/run/cinder/$vol_group-backing-file
+  vol_file=/var/lib/cinder/$vol_group-backing-file
   size=5000M
 
   if ! vgs $vol_group; then
     [[ -f $vol_file ]] || truncate -s $size $vol_file
     dev=`sudo losetup -f --show $vol_file`
     if ! vgs $vol_group; then vgcreate $vol_group $dev; fi
-    mkdir -p /var/run/cinder/volumes
+    mkdir -p /var/lib/cinder/volumes
   fi
 
   service iscsitarget start
@@ -72,6 +72,6 @@ modprobe nbd || true
 
 
 # TODO: for compute nodes only
-mkdir -p /var/run/nova/instances
-chown -R nova:nova /var/run/nova
+mkdir -p /var/lib/nova/instances
+chown -R nova:nova /var/lib/nova
 

@@ -9,25 +9,16 @@ function install_upstart {
   shift; shift; shift
   local args=$*
   cat > /etc/init/$name.conf <<EOF
-start on runlevel [2345]
+start on filesystem and net-device-up IFACE!=lo
 stop on runlevel [016]
-
-pre-start script
-  mkdir -p /var/run/$user
-  chown -R $user /var/run/$user
-end script
 
 respawn
 
-exec start-stop-daemon --start \\
-                       --chuid $user \\
-                       --chdir /var/run/$user \\
-                       --make-pidfile --pidfile /var/run/$user/$name.pid \\
-                       --exec $cmd -- $args >> /var/log/$user/$name.log 2>&1
+exec sudo -u $user $cmd $args
 EOF
 
-# Create symbolic link for /etc/init.d/$name for compatability
-ln -sf /lib/init/upstart-job /etc/init.d/$name
+  # Create symbolic link for /etc/init.d/$name so it will be run on boot
+  ln -sf /lib/init/upstart-job /etc/init.d/$name
 }
 
 if [ $# -lt 4 ]; then

@@ -10,9 +10,9 @@ function install-os-service() {
   local repo=$3
   local branch=$4
 
-  id $user || useradd $user --system -d /var/run/$user -s /bin/false
+  id $user || useradd $user --system -d /var/lib/$user -s /bin/false
 
-  for d in /var/log/$user /var/run/$user /etc/$user; do
+  for d in /var/log/$user /var/lib/$user /etc/$user; do
     mkdir -p $d
     chown -R $name:$name $d
   done
