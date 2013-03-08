@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Ugly, but lets you create some images to do a quick test
+#
+#  ./simple-test foobar 1 10
+#
+if [ -f ../stackrc ] ; then
+	source ../stackrc
+else
+	echo "You need to have a ../stackrc"
+	exit 1
+fi
+
+set -eux
+NAME=${1:-test}
+START=${2:-1}
+END=${3:-1}
+# Make a private key
+if [ ! -f ${NAME}.pem ] ; then 
+	nova keypair-add ${NAME} > ${NAME}.pem
+fi
+#else
+#	ssh-keygen -e -f ${NAME}.pem > ${NAME}-pub.pem 
+#	ssh-keygen -i -f ${NAME}-pub.pem > ${NAME}.pub
+#	nova keypair-add ${NAME} --pub-key ${NAME}.pub
+#fi
+
+# Create 10 images quickly
+for i in $(seq -f "%04g" ${START}  ${END}) ; 
+do
+	nova boot --image cirros --flavor m1.small --key_name ${NAME} ${NAME}-${i}
+done
+nova list
