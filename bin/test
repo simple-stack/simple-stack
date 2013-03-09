@@ -1,0 +1,84 @@
+#!/bin/bash
+set -eux
+root=$(dirname $(readlink -f $BASH_SOURCE))/..
+
+if [ $# -lt 1 ]; then
+  echo "usage: test ENV_PATH"
+  exit 1
+fi
+
+env=$root/$1
+instance_name=integration_test
+keypair_name=integration_test
+
+function die {
+  echo $1
+  exit 1
+}
+
+function gimme_an_openstack {
+  sudo $root/bin/install-controller $env
+  sudo $root/bin/install-compute $env
+}
+
+function a_happy_openstack {
+  keystone service-list | grep compute
+  glance index | grep quantal
+  for svc in nova-compute nova-conductor nova-scheduler; do
+    sudo nova-manage service list | grep $svc | grep ":-)"
+  done
+  nova flavor-list | grep tiny
+}
+
+function wait_for_instance {
+  timeout=60
+  while [ $timeout -gt 0 ]; do
+    if nova list | grep ERROR; then die "instance failed to spawn"; fi
+    if nova list | grep $1 | grep ACTIVE; then break; fi
+    sleep 1
+    let "timeout -= 1"
+  done
+  if [ $timeout -eq 0 ]; then die "timed out waiting for instance to spawn"; fi
+
+  sleep 5
+  nova list
+  ip=$(nova list | grep $1 | awk '{print $9}')
+
+  timeout=60
+  while [ $timeout -gt 0 ]; do
+    if run_in_vm $ip uptime; then break; fi
+    sleep 5
+    let "timeout -= 1"
+  done
+  if [ $timeout -eq 0 ]; then die "timed out waiting for sshd to come up"; fi
+}
+
+function boot_instance {
+  sudo rm -f /tmp/$keypair_name.pem
+  nova keypair-add $keypair_name > /tmp/$keypair_name.pem
+  chmod 0600 /tmp/$keypair_name.pem
+  nova boot --image quantal --flavor 1 --key_name $keypair_name $instance_name
+  wait_for_instance $instance_name
+}
+
+function run_in_vm {
+  local ip=$1
+  local cmd=$2
+  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /tmp/$keypair_name.pem ubuntu@$ip "$cmd"
+}
+
+function instance_is_connected {
+  run_in_vm $ip "ping -c 3 google.com"
+}
+
+function clean_up {
+  nova keypair-delete $keypair_name
+  nova delete $instance_name
+}
+
+gimme_an_openstack
+source $root/stackrc
+a_happy_openstack
+boot_instance
+instance_is_connected
+clean_up
