@@ -9,6 +9,9 @@ fi
 
 export OS_CONFIG=$1
 
+# here now just for convenience
+tempest
+
 common_deps
 db
 rabbit

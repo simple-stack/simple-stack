@@ -112,6 +112,9 @@ ADMIN_USER=$(get_id keystone user-create --name=admin \
 DEMO_USER=$(get_id keystone user-create --name=demo \
                                         --pass="$ADMIN_PASSWORD" \
                                         --email=admin@example.com)
+ALT_DEMO_USER=$(get_id keystone user-create --name=alt_demo \
+                                        --pass="$ADMIN_PASSWORD" \
+                                        --email=admin@example.com)
 
 
 # Roles

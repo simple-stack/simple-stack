@@ -122,6 +122,14 @@ function nova_except_compute {
   mkdir -p /tftpboot/pxelinux.cfg/
 }
 
+function tempest {
+  if [ ! -e /opt/stack/tempest ]; then
+    git clone --depth 1 https://github.com/openstack/tempest.git /opt/stack/tempest
+    pip install -r /opt/stack/tempest/tools/pip-requires
+    pip install -i http://pypi.openstack.org/ /opt/stack/tempest
+  fi
+}
+
 function ip_forwarding {
   ctl_iface=$(os-config-applier --key interfaces.control)
   pub_iface=$(os-config-applier --key interfaces.public)

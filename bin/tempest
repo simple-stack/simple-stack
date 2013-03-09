@@ -1,0 +1,5 @@
+#!/bin/bash
+source $(dirname $0)/../stackrc
+export IMAGE_ID=$(nova image-list | grep cirros | awk '{print $2}')
+export IMAGE_ID_ALT=$(nova image-list | grep quantal | awk '{print $2}')
+/opt/stack/tempest/run_tests.sh -N

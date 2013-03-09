@@ -82,3 +82,5 @@ a_happy_openstack
 boot_instance
 instance_is_connected
 clean_up
+
+echo "success!" | cowsay

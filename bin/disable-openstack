@@ -4,6 +4,8 @@ set -eu
 
 
 function disable {
+  sudo rm -rf /opt/stack
+
   sudo rm -rf \
     /etc/init/keystone* \
     /etc/init.d/keystone* \
