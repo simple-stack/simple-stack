@@ -15,17 +15,19 @@ set -eux
 NAME=${1:-test}
 START=${2:-1}
 END=${3:-1}
-# Make a private key
-if [ ! -f ${NAME}.pem ] ; then 
-	nova keypair-add ${NAME} > ${NAME}.pem
-fi
-#else
-#	ssh-keygen -e -f ${NAME}.pem > ${NAME}-pub.pem 
-#	ssh-keygen -i -f ${NAME}-pub.pem > ${NAME}.pub
-#	nova keypair-add ${NAME} --pub-key ${NAME}.pub
-#fi
 
-# Create 10 images quickly
+# Add a key to nova 
+if ! $(nova keypair-list | grep -q " ${NAME} ") ; then
+        if [ ! -f ${NAME}.pem ] ; then
+                nova keypair-add ${NAME} > ${NAME}.pem
+        else
+                ssh-keygen -e -f ${NAME}.pem > ${NAME}-pub.pem
+                ssh-keygen -i -f ${NAME}-pub.pem > ${NAME}.pub
+                nova keypair-add ${NAME} --pub-key ${NAME}.pub
+        fi
+fi
+
+# Create images quickly
 for i in $(seq -f "%04g" ${START}  ${END}) ; 
 do
 	nova boot --image cirros --flavor m1.small --key_name ${NAME} ${NAME}-${i}
