@@ -18,8 +18,8 @@ install_image cirros  "https://launchpad.net/cirros/trunk/0.3.0/+download/cirros
 install_image quantal "http://cloud-images.ubuntu.com/quantal/current/quantal-server-cloudimg-amd64-disk1.img"
 
 #nova-manage network create private 192.168.122.100/27 1 20
-nova-manage floating create $(os-config-applier --key nova.network.floating) --pool=nova
-nova-manage network create private $(os-config-applier --key nova.network.private) 1 256
+nova-manage floating create $(os-config-applier --key nova.network.floating) --pool=nova 
+nova-manage network create private $(os-config-applier --key nova.network.private) 1 256 --multi_host=T
 
 # allow ping and ssh
 nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
