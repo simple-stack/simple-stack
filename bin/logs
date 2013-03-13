@@ -18,13 +18,13 @@ source $this_dir/../stackrc
 eof
 
 for f in \
-  /var/log/keystone/keystone.log \
-  /var/log/nova/nova-api.log \
-  /var/log/nova/nova-compute.log \
+  /var/log/upstart/keystone.log \
+  /var/log/upstart/nova-api.log \
+  /var/log/upstart/nova-compute.log \
   /var/log/libvirt/libvirtd.log \
-  /var/log/nova/nova-scheduler.log \
-  /var/log/nova/nova-network.log \
-  /var/log/nova/glance-api.log; do
+  /var/log/upstart/nova-scheduler.log \
+  /var/log/upstart/nova-network.log \
+  /var/log/upstart/glance-api.log; do
   if [ -e $f ]; then
     echo "screen -t $(basename $f) sh -c \"tail -f $f | ccze\"" >> $scr_file
   fi
