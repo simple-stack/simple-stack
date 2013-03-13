@@ -1,33 +1,30 @@
-how to install you some openstack:
-==================================
+simple-stack
+============
 
-#### Preface: in the beginning was quantal
+production-ready OpenStack with minimal fuss.
 
-```
-see preface
-```
+### Usage
 
-#### Chapter 1: the repo is cloned
-```bash
-git clone git@github.com/echohead/dbaas_cloud.git
-```
+- install ubuntu quantal on your machines.
 
-#### Chapter 2: an environment is born
+- clone this repo: `git clone git@github.com:simple-stack/simple-stack.git`
+
+- define your environment:
+
 ```bash
 cp envs/localhost.json envs/my_env.json
 vi envs/my_env.json
-# add your ips, passwords, etc.
+# add your ips, passwords, subnets, etc.
 ```
 
-#### Chapter 3: a node asumes control
+- run this on the controller (db/*-api/rabbit) host:
+
 ```bash
-# on controller host:
 bin/install-controller envs/my_env.json
 ```
 
-#### Chapter 4: rise of the machines
+- run this on N compute nodes:
 ```bash
-# on compute N hosts:
 bin/install-compute envs/my_env.json
 ```
 
@@ -36,7 +33,7 @@ and openstack lived happily ever after.
 troubleshooting
 ----------------
 
-break into a screen session which tails all the logs:
+break into a screen session which tails most of the important logs:
 ```bash
 bin/logs
 ```
