@@ -210,7 +210,6 @@ keystone user-role-add --tenant-id $SERVICE_TENANT \
                        --user-id $VOLUME_USER \
                        --role-id $ADMIN_ROLE
 
-
 if [[ -n "$ENABLE_ENDPOINTS" ]]; then
     keystone endpoint-create --region RegionOne --service-id $VOLUME_SERVICE \
         --publicurl "http://$CONTROLLER_PUBLIC_ADDRESS:8776/v1/\$(tenant_id)s" \
