@@ -69,7 +69,7 @@ function glance {
 
 function cinder {
   install-packages lvm2
-  os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git
+  os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b stable/folsom
   give_sudo cinder
   os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder"
   os-svc-upstart cinder-volume cinder /usr/local/bin/cinder-volume "--config-dir /etc/cinder"
@@ -96,7 +96,7 @@ function rabbit {
 }
 
 function nova_common {
-  install-packages dnsmasq novnc dnsmasq-utils ebtables
+  install-packages dnsmasq dnsmasq-utils ebtables
   os-svc-install -n nova -u nova -r https://github.com/openstack/nova.git
   install-packages libvirt-bin python-libvirt kvm pm-utils
   usermod -a -G libvirtd nova
