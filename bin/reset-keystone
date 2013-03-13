@@ -202,6 +202,15 @@ VOLUME_SERVICE=$(get_id \
 keystone service-create --name="cinder" \
                         --type=volume \
                         --description="Cinder Volume Service")
+VOLUME_USER=$(get_id keystone user-create --name=cinder \
+                                          --pass="$SERVICE_PASSWORD" \
+                                          --tenant-id $SERVICE_TENANT \
+                                          --email=cinder@example.com)
+keystone user-role-add --tenant-id $SERVICE_TENANT \
+                       --user-id $VOLUME_USER \
+                       --role-id $ADMIN_ROLE
+
+
 if [[ -n "$ENABLE_ENDPOINTS" ]]; then
     keystone endpoint-create --region RegionOne --service-id $VOLUME_SERVICE \
         --publicurl "http://$CONTROLLER_PUBLIC_ADDRESS:8776/v1/\$(tenant_id)s" \
