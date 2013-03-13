@@ -66,8 +66,8 @@ function cinder_volume {
   sleep 5
   cinder list | grep available
   local vol_id=$(cinder list | grep $instance_name | awk '{print $2}')
-  nova volume-attach $instance_name $vol_id /dev/vdc
-  run_in_vm $ip cat /proc/partitions
+  nova volume-attach $instance_name $vol_id /dev/vdb
+  run_in_vm $ip "grep vdb /proc/partitions"
 }
 
 function run_in_vm {
