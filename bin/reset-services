@@ -3,7 +3,7 @@ set -eux
 
 os-config-applier --templates $(dirname $0)/../config
 
-if [ -e /etc/init.d/rabbitmq-server]; then
+if [ -e /etc/init.d/rabbitmq-server ]; then
   service rabbitmq-server restart
   # TODO: get pw from config
   #rabbitmqctl change_password guest stackqueue
