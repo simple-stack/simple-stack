@@ -66,7 +66,7 @@ function glance {
 }
 
 function cinder {
-  install-packages lvm2
+  install-packages lvm2 tgt
   os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b stable/folsom
   give_sudo cinder
   os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder"
