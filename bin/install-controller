@@ -11,7 +11,7 @@ export OS_CONFIG=$1
 
 # here now just for convenience
 tempest
-horizon
+#horizon
 
 common_deps
 db
