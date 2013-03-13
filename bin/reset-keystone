@@ -216,13 +216,6 @@ if [[ -n "$ENABLE_ENDPOINTS" ]]; then
         --adminurl "http://$CONTROLLER_ADMIN_ADDRESS:8776/v1/\$(tenant_id)s" \
         --internalurl "http://$CONTROLLER_INTERNAL_ADDRESS:8776/v1/\$(tenant_id)s"
 fi
-VOLUME_USER=$(get_id keystone user-create --name=cinder \
-                                         --pass="$SERVICE_PASSWORD" \
-                                         --tenant-id $SERVICE_TENANT \
-                                         --email=cinder@example.com)
-keystone user-role-add --tenant-id $SERVICE_TENANT \
-                       --user-id $VOLUME_USER \
-                       --role-id $ADMIN_ROLE
 
 keystone service-create --name="horizon" \
                         --type=dashboard \
