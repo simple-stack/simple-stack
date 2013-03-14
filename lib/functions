@@ -47,7 +47,7 @@ function client_tools {
 
 function db {
   install-packages mysql-server python-mysqldb
-  sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
+  sed -i 's/127.0.0.1/$(os-config-applier --key database.host)/g' /etc/mysql/my.cnf
 }
 
 function keystone {
