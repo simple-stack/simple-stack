@@ -9,7 +9,9 @@ function give_sudo {
 }
 
 function install-packages {
-  DEBIAN_FRONTEND=noninteractive apt-get --yes install $*
+  DEBIAN_FRONTEND="noninteractive" apt-get --yes install \
+  -o DPkg::Options::="--force-confdef" \
+  -o DPkg::Options::="--force-confold" $*
 }
 
 function install_scripts {
