@@ -67,6 +67,7 @@ modprobe nbd || true
 
 restart_if_exists nova-conductor
 restart_if_exists nova-api
+restart_if_exists nova-api-metadata
 restart_if_exists nova-cert
 restart_if_exists nova-rpc-zmq-receiver
 restart_if_exists nova-scheduler
