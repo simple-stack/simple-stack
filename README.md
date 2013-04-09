@@ -17,7 +17,7 @@ vi envs/my_env.json
 # add your ips, passwords, subnets, etc.
 ```
 
-- on the controller (db/*-api/rabbit) node: `bin/install-controller envs/my_env.json`
+- on the controller (db/api/rabbit) node: `bin/install-controller envs/my_env.json`
 
 - on N compute nodes: `bin/install-compute envs/my_env.json`
 
