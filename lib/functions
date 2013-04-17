@@ -40,7 +40,7 @@ function client_tools {
     if [ -z /opt/stack/$client ]; then
       git clone --depth 1 https://github.com/openstack/$client.git /opt/stack/$client
       [ -e /opt/stack/$client/tools/pip-requires ] && pip install -r /opts/stack/$client/tools/pip-requires
-      pip install -i http://pypi.openstack.org/ /opt/stack/$client
+      pip install -i http://pypi.openstack.org/openstack /opt/stack/$client
     fi
   done
 }
@@ -128,7 +128,7 @@ function tempest {
   if [ ! -e /opt/stack/tempest ]; then
     git clone --depth 1 https://github.com/openstack/tempest.git /opt/stack/tempest
     pip install -r /opt/stack/tempest/tools/pip-requires
-    pip install -i http://pypi.openstack.org/ /opt/stack/tempest
+    pip install -i http://pypi.openstack.org/openstack /opt/stack/tempest
   fi
 }
 
