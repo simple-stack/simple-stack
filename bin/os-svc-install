@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux
 
-pypi_mirror=http://pypi.openstack.org/
+pypi_mirror=http://pypi.openstack.org/openstack
 pip_install="pip install -i $pypi_mirror "
 
 function install-os-service() {
