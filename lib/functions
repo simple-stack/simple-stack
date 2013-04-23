@@ -8,6 +8,9 @@ cinder_branch=$(os-config-applier --key cinder.release)
 keystone_branch=$(os-config-applier --key keystone.release)
 horizon_branch=$(os-config-applier --key horizon.release)
 
+# This has changed recently but should not in the future
+pypi_url="http://pypi.openstack.org/openstack"
+
 function give_sudo {
   user=$1
   echo "$user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$user
@@ -48,7 +51,7 @@ function client_tools {
     if [ -z /opt/stack/$client ]; then
       git clone --depth 1 https://github.com/openstack/$client.git /opt/stack/$client
       [ -e /opt/stack/$client/tools/pip-requires ] && pip install -r /opts/stack/$client/tools/pip-requires
-      pip install -i http://pypi.openstack.org/openstack /opt/stack/$client
+      pip install -i ${pypi_url} /opt/stack/$client
     fi
   done
 }
@@ -135,7 +138,7 @@ function tempest {
     # os-svc-install -n tempest -u tempest -r https://github.com/openstack/tempest.git -b $tempest_branch
     git clone --depth 1 -b $tempest_branch https://github.com/openstack/tempest.git /opt/stack/tempest
     pip install -r /opt/stack/tempest/tools/pip-requires
-    pip install -i http://pypi.openstack.org/openstack /opt/stack/tempest
+    pip install -i ${pypi_url} /opt/stack/tempest
   fi
 }
 
