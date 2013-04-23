@@ -1,6 +1,13 @@
 #!/bin/bash
 set -eux
 
+# Set the release branch
+nova_branch=$(os-config-applier --key nova.release)
+glance_branch=$(os-config-applier --key glance.release)
+cinder_branch=$(os-config-applier --key cinder.release)
+keystone_branch=$(os-config-applier --key keystone.release)
+horizon_branch=$(os-config-applier --key horizon.release)
+
 function give_sudo {
   user=$1
   echo "$user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$user
@@ -36,6 +43,7 @@ function drop_heat_data {
 }
 
 function client_tools {
+  # These tools should aways be backwards compatable. So grabbing the latest from trunk should work.
   for client in python-novaclient python-quantumclient python-glanceclient python-keystoneclient; do
     if [ -z /opt/stack/$client ]; then
       git clone --depth 1 https://github.com/openstack/$client.git /opt/stack/$client
@@ -51,15 +59,12 @@ function db {
 }
 
 function keystone {
-  os-svc-install -n keystone -u keystone -r https://github.com/openstack/keystone.git
+  os-svc-install -n keystone -u keystone -r https://github.com/openstack/keystone.git -b $keystone_branch
   os-svc-upstart keystone keystone /usr/local/bin/keystone-all "--config-dir /etc/keystone --log-config /etc/keystone/logging.conf"
   mkdir -p /etc/keystone/ssl && chown -R keystone:keystone /etc/keystone/ssl
 }
 
 function glance {
-  # latest glance crashes at the moment, use folsom for now
-  # https://bugs.launchpad.net/ubuntu/+source/python-glanceclient/+bug/1131327
-  glance_branch=stable/folsom
 
   os-svc-install -n glance -u glance -r https://github.com/openstack/glance.git -b $glance_branch
   mkdir -p /var/lib/glance/images && chown -R glance:glance /var/lib/glance/images
@@ -69,7 +74,7 @@ function glance {
 
 function cinder {
   install-packages lvm2 tgt
-  os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b stable/folsom
+  os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b $cinder_branch
   give_sudo cinder
   os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder"
   os-svc-upstart cinder-volume cinder /usr/local/bin/cinder-volume "--config-dir /etc/cinder"
@@ -85,7 +90,7 @@ function cinder {
 function horizon {
   install-packages nodejs python-openssl python-dev
   which node || ln -s $(which nodejs) /usr/bin/node
-  os-svc-install -n horizon -u horizon -r https://github.com/openstack/horizon.git
+  os-svc-install -n horizon -u horizon -r https://github.com/openstack/horizon.git -b $horizon_branch
   if [ ! -e /opt/stack/horizon/.venv ]; then python /opt/stack/horizon/tools/install_venv.py; fi
   mkdir -p /opt/stack/horizon/static && chown -R horizon:horizon /opt/stack/horizon/static
   os-svc-upstart horizon horizon /opt/stack/horizon/manage.py "runserver 0.0.0.0:8080"
@@ -97,9 +102,10 @@ function rabbit {
 
 function nova_common {
   install-packages dnsmasq dnsmasq-utils ebtables
-  os-svc-install -n nova -u nova -r https://github.com/openstack/nova.git
+  os-svc-install -n nova -u nova -r https://github.com/openstack/nova.git -b $nova_branch
   install-packages libvirt-bin python-libvirt kvm pm-utils
   usermod -a -G libvirtd nova
+  # This should be reviewed for security
   give_sudo nova
   mkdir -p /var/lib/nova/keys && chown -R nova:nova /var/lib/nova/keys
   chown -R nova:nova /var/lib/misc/
@@ -126,7 +132,8 @@ function nova_except_compute {
 
 function tempest {
   if [ ! -e /opt/stack/tempest ]; then
-    git clone --depth 1 https://github.com/openstack/tempest.git /opt/stack/tempest
+    # os-svc-install -n tempest -u tempest -r https://github.com/openstack/tempest.git -b $tempest_branch
+    git clone --depth 1 -b $tempest_branch https://github.com/openstack/tempest.git /opt/stack/tempest
     pip install -r /opt/stack/tempest/tools/pip-requires
     pip install -i http://pypi.openstack.org/openstack /opt/stack/tempest
   fi

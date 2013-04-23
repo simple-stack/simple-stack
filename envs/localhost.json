@@ -1,5 +1,4 @@
 {
-  "release": "stable/grizzly",
   "admin-token": "foobar",
   "service-password": "foobaz",
   "admin-password": "kilgore",
@@ -16,6 +15,7 @@
     "internal_address": "127.0.0.1"
   },
   "keystone": {
+    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "db": "mysql://keystone:stackdb@localhost/keystone"
   },
@@ -24,10 +24,12 @@
     "password": "guest"
   },
   "glance": {
+    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "db": "mysql://glance:stackdb@localhost/glance"
   },
   "nova": {
+    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "db":    "mysql://nova:stackdb@localhost/nova",
     "libvirt_type": "qemu",
@@ -41,9 +43,11 @@
     }
   },
   "cinder": {
+    "release": "stable/grizzly",
     "db": "mysql://cinder:stackdb@localhost/cinder"
   },
   "quantum": {
+    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "ovs_db": "mysql://quantum:stackdb@localhost/ovs_quantum?charset=utf8"
   }
