@@ -50,5 +50,9 @@
     "release": "stable/grizzly",
     "host": "127.0.0.1",
     "ovs_db": "mysql://quantum:stackdb@localhost/ovs_quantum?charset=utf8"
+  },
+  "horizon": {
+    "release": "stable/grizzly"
   }
 }
+
