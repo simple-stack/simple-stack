@@ -1,13 +1,17 @@
 #!/bin/bash
 set -eux
+function my_trap_handler()
+{
+        MYSELF="$0"               # equals to my script name
+        LASTLINE="$1"            # argument 1: last line of error occurence
+        LASTERR="$2"             # argument 2: error code of last command
+        echo "${MYSELF}: line ${LASTLINE}: exit status of last command: ${LASTERR}"
+
+        # do additional processing: send email or SNMP trap, write result to database, etc.
+}
+trap 'my_trap_handler ${LINENO} ${$?}' ERR
 
 # Set the release branch
-nova_branch=$(os-config-applier --key nova.release)
-glance_branch=$(os-config-applier --key glance.release)
-cinder_branch=$(os-config-applier --key cinder.release)
-keystone_branch=$(os-config-applier --key keystone.release)
-horizon_branch=$(os-config-applier --key horizon.release)
-tempest_branch=$(os-config-applier --key tempest.release)
 
 # This has changed recently but should not in the future
 pypi_url="http://pypi.openstack.org/openstack"
@@ -49,9 +53,9 @@ function drop_heat_data {
 function client_tools {
   # These tools should aways be backwards compatable. So grabbing the latest from trunk should work.
   for client in python-novaclient python-quantumclient python-glanceclient python-keystoneclient; do
-    if [ -z /opt/stack/$client ]; then
+    if [ ! -d /opt/stack/$client ]; then
       git clone --depth 1 https://github.com/openstack/$client.git /opt/stack/$client
-      [ -e /opt/stack/$client/tools/pip-requires ] && pip install -r /opts/stack/$client/tools/pip-requires
+      [ -e /opt/stack/$client/tools/pip-requires ] && pip install -r /opt/stack/$client/tools/pip-requires
       pip install -i ${pypi_url} /opt/stack/$client
     fi
   done
@@ -63,13 +67,14 @@ function db {
 }
 
 function keystone {
+  local keystone_branch=$(os-config-applier --key keystone.release)
   os-svc-install -n keystone -u keystone -r https://github.com/openstack/keystone.git -b $keystone_branch
   os-svc-upstart keystone keystone /usr/local/bin/keystone-all "--config-dir /etc/keystone --log-config /etc/keystone/logging.conf"
   mkdir -p /etc/keystone/ssl && chown -R keystone:keystone /etc/keystone/ssl
 }
 
 function glance {
-
+  local glance_branch=$(os-config-applier --key glance.release)
   os-svc-install -n glance -u glance -r https://github.com/openstack/glance.git -b $glance_branch
   mkdir -p /var/lib/glance/images && chown -R glance:glance /var/lib/glance/images
   os-svc-upstart glance-api glance /usr/local/bin/glance-api "--debug --log-config /etc/glance/logging.conf"
@@ -78,6 +83,7 @@ function glance {
 
 function cinder {
   install-packages lvm2 tgt
+  local cinder_branch=$(os-config-applier --key cinder.release)
   os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b $cinder_branch
   give_sudo cinder
   os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder"
@@ -94,6 +100,7 @@ function cinder {
 function horizon {
   install-packages nodejs python-openssl python-dev
   which node || ln -s $(which nodejs) /usr/bin/node
+  local horizon_branch=$(os-config-applier --key horizon.release)
   os-svc-install -n horizon -u horizon -r https://github.com/openstack/horizon.git -b $horizon_branch
   if [ ! -e /opt/stack/horizon/.venv ]; then python /opt/stack/horizon/tools/install_venv.py; fi
   mkdir -p /opt/stack/horizon/static && chown -R horizon:horizon /opt/stack/horizon/static
@@ -106,6 +113,7 @@ function rabbit {
 
 function nova_common {
   install-packages dnsmasq dnsmasq-utils ebtables
+  local nova_branch=$(os-config-applier --key nova.release)
   os-svc-install -n nova -u nova -r https://github.com/openstack/nova.git -b $nova_branch
   install-packages libvirt-bin python-libvirt kvm pm-utils
   usermod -a -G libvirtd nova
@@ -136,6 +144,7 @@ function nova_except_compute {
 
 function tempest {
   if [ ! -e /opt/stack/tempest ]; then
+    tempest_branch=$(os-config-applier --key tempest.release)
     # os-svc-install -n tempest -u tempest -r https://github.com/openstack/tempest.git -b $tempest_branch
     git clone --depth 1 -b $tempest_branch https://github.com/openstack/tempest.git /opt/stack/tempest
     pip install -r /opt/stack/tempest/tools/pip-requires
