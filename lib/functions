@@ -75,8 +75,8 @@ function glance {
   local glance_branch=$(os-config-applier --key glance.release)
   os-svc-install -n glance -u glance -r https://github.com/openstack/glance.git -b $glance_branch
   mkdir -p /var/lib/glance/images && chown -R glance:glance /var/lib/glance/images
-  os-svc-upstart glance-api glance /usr/local/bin/glance-api "--debug --log-config /etc/glance/logging.conf"
-  os-svc-upstart glance-reg glance /usr/local/bin/glance-registry "--debug --log-config /etc/glance/logging.conf"
+  os-svc-upstart glance-api glance /usr/local/bin/glance-api "--debug --log-config /etc/glance/logging.conf --use-syslog"
+  os-svc-upstart glance-reg glance /usr/local/bin/glance-registry "--debug --log-config /etc/glance/logging.conf --use-syslog"
 }
 
 function cinder {
@@ -84,9 +84,9 @@ function cinder {
   local cinder_branch=$(os-config-applier --key cinder.release)
   os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b $cinder_branch
   give_sudo cinder
-  os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder"
-  os-svc-upstart cinder-volume cinder /usr/local/bin/cinder-volume "--config-dir /etc/cinder --debug"
-  os-svc-upstart cinder-scheduler cinder /usr/local/bin/cinder-scheduler "--config-dir /etc/cinder"
+  os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder --use-syslog"
+  os-svc-upstart cinder-volume cinder /usr/local/bin/cinder-volume "--config-dir /etc/cinder --debug --use-syslog"
+  os-svc-upstart cinder-scheduler cinder /usr/local/bin/cinder-scheduler "--config-dir /etc/cinder --use-syslog"
   mkdir -p /etc/tgt/conf.d
   echo 'include /etc/tgt/conf.d/cinder_tgt.conf' > /etc/tgt/targets.conf
   echo 'include /var/lib/cinder/volumes/*' > /etc/tgt/conf.d/cinder_tgt.conf
@@ -116,24 +116,24 @@ function nova_common {
   give_sudo nova
   mkdir -p /var/lib/nova/keys && chown -R nova:nova /var/lib/nova/keys
   chown -R nova:nova /var/lib/misc/
-  os-svc-upstart nova-network          nova /usr/local/bin/nova-network          "--config-dir /etc/nova --debug"
+  os-svc-upstart nova-network          nova /usr/local/bin/nova-network          "--config-dir /etc/nova --debug --use-syslog"
 }
 
 function nova_compute {
   nova_common
-  os-svc-upstart nova-compute          nova /usr/local/bin/nova-compute          "--config-dir /etc/nova --debug"
-  os-svc-upstart nova-api-metadata     nova /usr/local/bin/nova-api-metadata     "--config-dir /etc/nova"
+  os-svc-upstart nova-compute          nova /usr/local/bin/nova-compute          "--config-dir /etc/nova --debug --use-syslog"
+  os-svc-upstart nova-api-metadata     nova /usr/local/bin/nova-api-metadata     "--config-dir /etc/nova --use-syslog"
 }
 
 function nova_except_compute {
   nova_common
 
-  os-svc-upstart nova-api              nova /usr/local/bin/nova-api              "--config-dir /etc/nova"
-  os-svc-upstart nova-rpc-zmq-receiver nova /usr/local/bin/nova-rpc-zmq-receiver "--config-dir /etc/nova"
-  os-svc-upstart nova-cert             nova /usr/local/bin/nova-cert             "--config-dir /etc/nova"
+  os-svc-upstart nova-api              nova /usr/local/bin/nova-api              "--config-dir /etc/nova --use-syslog"
+  os-svc-upstart nova-rpc-zmq-receiver nova /usr/local/bin/nova-rpc-zmq-receiver "--config-dir /etc/nova --use-syslog"
+  os-svc-upstart nova-cert             nova /usr/local/bin/nova-cert             "--config-dir /etc/nova --use-syslog"
   os-svc-upstart nova-scheduler        nova /usr/local/bin/nova-scheduler        "--config-dir /etc/nova --debug"
-  os-svc-upstart nova-consoleauth      nova /usr/local/bin/nova-consoleauth      "--config-dir /etc/nova"
-  os-svc-upstart nova-conductor        nova /usr/local/bin/nova-conductor        "--config-dir /etc/nova"
+  os-svc-upstart nova-consoleauth      nova /usr/local/bin/nova-consoleauth      "--config-dir /etc/nova --use-syslog"
+  os-svc-upstart nova-conductor        nova /usr/local/bin/nova-conductor        "--config-dir /etc/nova --use-syslog"
 
   mkdir -p /tftpboot/pxelinux.cfg/
 }
