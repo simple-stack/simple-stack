@@ -13,11 +13,13 @@ function install-os-service() {
   # The nova users needs a shell for sudo
   if [ $user == nova ] ; then  
     shell="/bin/bash"
+    disabled="--disabled-password"
   else
     shell="/bin/false"
+    disabled="--disabled-login"
   fi
 
-  id $user || useradd $user -g $user --system -d /var/lib/$user -s $shell
+  id $user || adduser --system --group --disabled-password --home /var/lib/$user --shell $shell $disabled $user
 
 
   for d in /var/log/$user /var/lib/$user /etc/$user; do
