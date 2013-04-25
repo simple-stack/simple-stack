@@ -11,8 +11,6 @@ function my_trap_handler()
 }
 trap 'my_trap_handler ${LINENO} ${$?}' ERR
 
-# Set the release branch
-
 # This has changed recently but should not in the future
 pypi_url="http://pypi.openstack.org/openstack"
 
@@ -82,19 +80,17 @@ function glance {
 }
 
 function cinder {
-  install-packages lvm2 tgt
+  install-packages lvm2 tgt linux-headers-`uname -r` iscsitarget iscsitarget-dkms
   local cinder_branch=$(os-config-applier --key cinder.release)
   os-svc-install -n cinder -u cinder -r https://github.com/openstack/cinder.git -b $cinder_branch
   give_sudo cinder
   os-svc-upstart cinder-api cinder /usr/local/bin/cinder-api "--config-dir /etc/cinder"
-  os-svc-upstart cinder-volume cinder /usr/local/bin/cinder-volume "--config-dir /etc/cinder"
+  os-svc-upstart cinder-volume cinder /usr/local/bin/cinder-volume "--config-dir /etc/cinder --debug"
   os-svc-upstart cinder-scheduler cinder /usr/local/bin/cinder-scheduler "--config-dir /etc/cinder"
   mkdir -p /etc/tgt/conf.d
   echo 'include /etc/tgt/conf.d/cinder_tgt.conf' > /etc/tgt/targets.conf
   echo 'include /var/lib/cinder/volumes/*' > /etc/tgt/conf.d/cinder_tgt.conf
 
-  install-packages linux-headers-`uname -r`
-  install-packages iscsitarget iscsitarget-dkms
 }
 
 function horizon {
@@ -112,21 +108,20 @@ function rabbit {
 }
 
 function nova_common {
-  install-packages dnsmasq dnsmasq-utils ebtables
+  install-packages dnsmasq dnsmasq-utils ebtables libvirt-bin python-libvirt kvm pm-utils
   local nova_branch=$(os-config-applier --key nova.release)
   os-svc-install -n nova -u nova -r https://github.com/openstack/nova.git -b $nova_branch
-  install-packages libvirt-bin python-libvirt kvm pm-utils
   usermod -a -G libvirtd nova
   # This should be reviewed for security
   give_sudo nova
   mkdir -p /var/lib/nova/keys && chown -R nova:nova /var/lib/nova/keys
   chown -R nova:nova /var/lib/misc/
-  os-svc-upstart nova-network          nova /usr/local/bin/nova-network          "--config-dir /etc/nova"
+  os-svc-upstart nova-network          nova /usr/local/bin/nova-network          "--config-dir /etc/nova --debug"
 }
 
 function nova_compute {
   nova_common
-  os-svc-upstart nova-compute          nova /usr/local/bin/nova-compute          "--config-dir /etc/nova"
+  os-svc-upstart nova-compute          nova /usr/local/bin/nova-compute          "--config-dir /etc/nova --debug"
   os-svc-upstart nova-api-metadata     nova /usr/local/bin/nova-api-metadata     "--config-dir /etc/nova"
 }
 
@@ -139,17 +134,13 @@ function nova_except_compute {
   os-svc-upstart nova-scheduler        nova /usr/local/bin/nova-scheduler        "--config-dir /etc/nova --debug"
   os-svc-upstart nova-consoleauth      nova /usr/local/bin/nova-consoleauth      "--config-dir /etc/nova"
   os-svc-upstart nova-conductor        nova /usr/local/bin/nova-conductor        "--config-dir /etc/nova"
+
   mkdir -p /tftpboot/pxelinux.cfg/
 }
 
 function tempest {
-  if [ ! -e /opt/stack/tempest ]; then
-    local tempest_branch=$(os-config-applier --key tempest.release)
-    # os-svc-install -n tempest -u tempest -r https://github.com/openstack/tempest.git -b $tempest_branch
-    git clone --depth 1 -b $tempest_branch https://github.com/openstack/tempest.git /opt/stack/tempest
-    pip install -r /opt/stack/tempest/tools/pip-requires
-    pip install -i ${pypi_url} /opt/stack/tempest
-  fi
+  local tempest_branch=$(os-config-applier --key tempest.release)
+  os-svc-install -n tempest -u tempest -r https://github.com/openstack/tempest.git -b $tempest_branch
 }
 
 function ip_forwarding {
@@ -183,9 +174,12 @@ function common_deps {
   drop_heat_data
   install_scripts
   apt-get update
-  install-packages git ipmitool python-dev python-pip python-greenlet python-mysqldb screen cowsay ccze libxml2-dev libxslt-dev python-zmq
-  install-packages openvswitch-common openvswitch-controller openvswitch-switch open-iscsi
-  install-packages python-numpy python-lxml
+
+  install-packages git ipmitool python-dev python-pip python-greenlet \
+    python-mysqldb screen cowsay ccze libxml2-dev libxslt-dev python-zmq \
+    openvswitch-common openvswitch-controller openvswitch-switch \
+    open-iscsi python-numpy python-lxml
+
   ip_forwarding
   client_tools
   gen_stackrc
