@@ -9,17 +9,15 @@ fi
 
 export OS_CONFIG=$1
 
-# here now just for convenience
-tempest
-#horizon
-
-common_deps
+common_deps ; # Must be first 
 db
 rabbit
 keystone
 glance
 cinder
 nova_except_compute
+# horizon
+# tempest 
 
 $(dirname $0)/reset-db
 $(dirname $0)/reset-services
