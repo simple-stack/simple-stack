@@ -1,0 +1,81 @@
+#!/bin/bash
+set -eux
+root=$(dirname $0)/..
+source $root/lib/functions
+
+if [ $# -ne 2 ]; then
+  echo "usage: install_db <node-id> <comma-seperated-other-node-ips>"
+  exit 1
+fi
+NODE_ID=$1
+REPL_IPS=$2
+
+# percona apt sources
+gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
+gpg -a --export CD2EFD2A | apt-key add -
+
+cat > /etc/apt/sources.list.d/percona.list <<eof
+deb http://repo.percona.com/apt quantal main
+deb-src http://repo.percona.com/apt quantal main
+eof
+
+cat > /etc/apt/preferences.d/00percona.pref <<eof
+Package: *
+Pin: release o=Percona Development Team
+Pin-Priority: 1001
+eof
+
+apt-get update
+
+# install percona + galera
+install-packages percona-xtradb-cluster-client-5.5 percona-xtradb-cluster-server-5.5 percona-xtrabackup
+
+cat > /etc/mysql/my.cnf <<eof
+[client]
+port   = 3306
+socket = /var/run/mysqld/mysqld.sock
+
+[mysqld]
+port                    = 3306
+datadir                 = /var/lib/mysql
+socket                  = /var/run/mysqld/mysqld.sock
+max_connections         = 100
+transaction-isolation   = 'READ-COMMITTED'
+
+skip-external-locking
+skip-name-resolve
+
+innodb_flush_method                 = ALL_O_DIRECT
+innodb_buffer_pool_size             = 8M
+innodb_log_buffer_size              = 8M
+innodb_log_file_size                = 50M
+innodb_support_xa                   = 0 # OK with Galera synchronous replication
+innodb_import_table_from_xtrabackup = 1 # allows restoring a single table
+innodb_flush_log_at_trx_commit      = 0 # speeds things up, can lose 1 second worth of transactions if MySQL crashes.
+innodb_doublewrite                  = 1 # ensures an incremental state transfer will be tried if possible
+innodb_file_per_table
+
+wsrep_node_name                = "$(hostname -f)"
+wsrep_cluster_address          = "gcomm://$REPL_IPS"
+
+binlog_format                  = row
+innodb_locks_unsafe_for_binlog = 1
+server-id                      = $NODE_ID
+innodb_autoinc_lock_mode       = 2
+query_cache_type               = 0
+query_cache_size               = 0
+default_storage_engine         = InnoDB
+wsrep_cluster_name             = "Percona-XtraDB-Cluster"
+wsrep_provider                 = /usr/lib/libgalera_smm.so
+wsrep_slave_threads            = 16 # recommended: 4 slave thread per core
+wsrep_retry_autocommit         = 2 # how many times to retry deadlocked autocommits
+wsrep_convert_LOCK_to_trx      = 0 # convert locking sessions into transactions
+wsrep_certify_nonPK            = 1 # Generate fake primary keys for non-PK tables (required for multi-master and parallel applying operation)
+
+
+# rsync or xtrabackup; remember to create the user 'mysql'@'localhost' on each node, with all privileges for the xtrabackup-based SST to work
+wsrep_sst_method               = rsync
+#wsrep_sst_method               = xtrabackup
+eof
+
+service mysql restart
