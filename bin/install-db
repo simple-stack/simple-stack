@@ -17,9 +17,10 @@ wget https://www.percona.com/redir/downloads/RPM-GPG-KEY-percona \
 gpg --import $keyfile
 gpg -a --export CD2EFD2A | apt-key add -
 
+# TODO - ubuntu release should be configurable.
 cat > /etc/apt/sources.list.d/percona.list <<eof
-deb http://repo.percona.com/apt quantal main
-deb-src http://repo.percona.com/apt quantal main
+deb http://repo.percona.com/apt precise main
+deb-src http://repo.percona.com/apt precise main
 eof
 
 cat > /etc/apt/preferences.d/00percona.pref <<eof
