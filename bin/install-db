@@ -12,8 +12,8 @@ REPL_IPS=$2
 
 # percona apt sources
 keyfile=$(tempfile)
-wget -q https://www.percona.com/redir/downloads/RPM-GPG-KEY-percona \
-     -o $keyfile
+wget https://www.percona.com/redir/downloads/RPM-GPG-KEY-percona \
+     -O $keyfile
 gpg --import $keyfile
 gpg -a --export CD2EFD2A | apt-key add -
 
