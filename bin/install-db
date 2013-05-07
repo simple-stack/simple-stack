@@ -11,7 +11,10 @@ NODE_ID=$1
 REPL_IPS=$2
 
 # percona apt sources
-gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
+keyfile=$(tempfile)
+wget -q https://www.percona.com/redir/downloads/RPM-GPG-KEY-percona \
+     -o $keyfile
+gpg --import $keyfile
 gpg -a --export CD2EFD2A | apt-key add -
 
 cat > /etc/apt/sources.list.d/percona.list <<eof
