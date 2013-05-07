@@ -46,6 +46,7 @@ function drop_heat_data {
   local private_iface=$(os-config-applier --key nova.network.private_interface)
   local my_ip=$(ip addr show | grep "global $private_iface" | awk '{print $2}' | awk -F/ '{print $1}')
   sed -i "s/\"my_ip\": \".*\"/\"my_ip\": \"$my_ip\"/" $heat_file
+  sed -i "s/\"routing_source\": \".*\"/\"routing_source\": \"$my_ip\"/" $heat_file
 }
 
 function client_tools {
@@ -170,6 +171,7 @@ eof
 
 
 function common_deps {
+  install-packages python-pip
   pip install -U git+https://github.com/echohead/os-config-applier.git
   drop_heat_data
   install_scripts
