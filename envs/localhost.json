@@ -7,7 +7,8 @@
     "public": "eth0"
   },
   "database": {
-    "password": "stackdb"
+    "password": "stackdb",
+    "host": "localhost"
   },
   "openstack": {
     "public_address":   "127.0.0.1",
@@ -35,6 +36,7 @@
     "libvirt_type": "qemu",
     "compute_driver": "nova.virt.libvirt.LibvirtDriver",
     "network": {
+      "flat_interface": "eth0",
       "floating": "15.125.16.100/26",
       "routing_source": "15.125.16.1",
       "private":  "10.0.0.0/24",
