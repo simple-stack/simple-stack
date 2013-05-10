@@ -153,6 +153,7 @@ mkswap: CommandFilter, /sbin/mkswap, root
 # nova/virt/xenapi/vm_utils.py: 'mkfs'
 mkfs: CommandFilter, /sbin/mkfs, root
 mkfs.ext3: CommandFilter, /sbin/mkfs.ext3, root
+mkfs.xfs: CommandFilter, /sbin/mkfs.xfs, root
 
 # nova/virt/libvirt/utils.py: 'qemu-img'
 qemu-img: CommandFilter, /usr/bin/qemu-img, root
