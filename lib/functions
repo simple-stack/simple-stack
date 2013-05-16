@@ -43,10 +43,16 @@ function drop_heat_data {
   os-config-applier --templates $(dirname $0)/../config
 
   # TODO: parse json, don't use sed
+  # Working on networking here... -Yazz
+  # 
   local private_iface=$(os-config-applier --key nova.network.private_interface)
-  local my_ip=$(ip addr show | grep "global $private_iface" | awk '{print $2}' | awk -F/ '{print $1}')
+  local routing_source=$(ip addr show | grep "global $private_iface" | awk '{print $2}' | awk -F/ '{print $1}')
+  sed -i "s/\"routing_source\": \".*\"/\"routing_source\": \"$routing_source\"/" $heat_file
+
+  local public_iface=$(os-config-applier --key nova.network.public_interface)
+  local my_ip=$(ip addr show | grep "global $public_iface" | awk '{print $2}' | awk -F/ '{print $1}')
   sed -i "s/\"my_ip\": \".*\"/\"my_ip\": \"$my_ip\"/" $heat_file
-  sed -i "s/\"routing_source\": \".*\"/\"routing_source\": \"$my_ip\"/" $heat_file
+
 }
 
 function client_tools {
