@@ -8,7 +8,11 @@
   },
   "database": {
     "password": "stackdb",
-    "host": "localhost"
+    "replication": [
+      "10.0.3.100",
+      "10.0.3.101",
+      "10.0.3.102"
+    ]
   },
   "openstack": {
     "public_address":   "127.0.0.1",
@@ -16,7 +20,6 @@
     "internal_address": "127.0.0.1"
   },
   "keystone": {
-    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "db": "mysql://keystone:stackdb@localhost/keystone"
   },
@@ -25,37 +28,26 @@
     "password": "guest"
   },
   "glance": {
-    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "db": "mysql://glance:stackdb@localhost/glance"
   },
   "nova": {
-    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "db":    "mysql://nova:stackdb@localhost/nova",
     "libvirt_type": "qemu",
-    "compute_driver": "nova.virt.libvirt.LibvirtDriver",
     "network": {
-      "flat_interface": "eth0",
       "floating": "15.125.16.100/26",
-      "routing_source": "TBD by install script",
+      "routing_source": "15.125.16.1",
       "private":  "10.0.0.0/24",
-      "private_size": 8000,
       "public_interface": "eth0",
       "my_ip": "TBD by install script"
     }
   },
   "cinder": {
-    "release": "stable/grizzly",
     "db": "mysql://cinder:stackdb@localhost/cinder"
   },
   "quantum": {
-    "release": "stable/grizzly",
     "host": "127.0.0.1",
     "ovs_db": "mysql://quantum:stackdb@localhost/ovs_quantum?charset=utf8"
-  },
-  "horizon": {
-    "release": "stable/grizzly"
   }
 }
-
