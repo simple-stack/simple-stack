@@ -46,9 +46,6 @@ function restart_if_exists {
 }
 
 
-# ufw can cause obscure problems
-ufw disable
-
 # cirros image won't do dhcp without this:
 iptables -A POSTROUTING -t mangle -p udp --dport 68 -j CHECKSUM --checksum-fill
 
