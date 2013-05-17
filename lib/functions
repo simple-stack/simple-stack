@@ -129,7 +129,7 @@ function nova_common {
 function nova_compute {
   nova_common
   os-svc-upstart nova-compute          nova /usr/local/bin/nova-compute          "--config-dir /etc/nova --debug --use-syslog"
-  os-svc-upstart nova-api-metadata     nova /usr/local/bin/nova-api-metadata     "--config-dir /etc/nova --use-syslog"
+  os-svc-upstart nova-api              nova /usr/local/bin/nova-api              "--config-dir /etc/nova --use-syslog"
 }
 
 function nova_except_compute {
