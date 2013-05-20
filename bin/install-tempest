@@ -1,0 +1,12 @@
+#!/bin/bash
+set -eux
+source $(dirname $0)/../lib/functions
+
+if [ $# -ne 1 ]; then
+  echo "usage: install-tempest <config_path>"
+  exit 1
+fi
+
+export OS_CONFIG=$1
+
+tempest
