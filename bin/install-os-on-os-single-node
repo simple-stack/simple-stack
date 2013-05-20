@@ -73,6 +73,9 @@ cat > openstack_env.json << EOF
   },
   "horizon": {
     "release": "stable/grizzly"
+  },
+  "tempest": {
+    "release": "stable/grizzly"
   }
 }
 EOF
