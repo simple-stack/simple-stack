@@ -58,6 +58,9 @@
   },
   "horizon": {
     "release": "stable/grizzly"
+  },
+  "tempest": {
+    "release": "stable/grizzly"
   }
 }
 
