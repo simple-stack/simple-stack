@@ -56,10 +56,10 @@ cat > openstack_env.json << EOF
       "flat_interface": "br100",
       "flat_network_bridge": "br100",
       "floating": "15.125.16.100/26",
-      "routing_source":\"$myip\",
+      "routing_source":"$myip",
       "private":  "192.168.100.0/24",
       "public_interface": "eth0",
-      "my_ip":\"$myip\"
+      "my_ip":"$myip"
     }
   },
   "cinder": {
