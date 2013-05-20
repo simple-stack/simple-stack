@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# install utils
+sudo apt-get install bridge-utils
+
+# setup bridge networking
+sudo brctl addbr br100
+sudo ip link set br100 up
+sudo service networking restart
+
+# create simple-stack environment json
+myip=`ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+
+cat > openstack_env.json << EOF
+{
+  "admin-token": "foobar",
+  "service-password": "foobaz",
+  "admin-password": "kilgore",
+  "interfaces": {
+    "control": "eth0",
+    "public": "eth0"
+  },
+  "database": {
+    "password": "stackdb",
+    "host": "localhost"
+  },
+  "openstack": {
+    "public_address": "127.0.0.1",
+    "admin_address": "127.0.0.1",
+    "internal_address": "127.0.0.1"
+  },
+  "keystone": {
+    "release": "stable/grizzly",
+    "host": "127.0.0.1",
+    "db": "mysql://keystone:stackdb@localhost/keystone"
+  },
+  "rabbit": {
+    "host": "127.0.0.1",
+    "password": "guest"
+  },
+  "glance": {
+    "release": "stable/grizzly",
+    "host": "127.0.0.1",
+    "db": "mysql://glance:stackdb@localhost/glance"
+  },
+  "nova": {
+    "release": "stable/grizzly",
+    "host": "127.0.0.1",
+    "db":    "mysql://nova:stackdb@localhost/nova",
+    "libvirt_type": "qemu",
+    "compute_driver": "nova.virt.libvirt.LibvirtDriver",
+    "debug": "True",
+    "multi_host": "false",
+    "send_arp_for_ha": "false",
+    "network": {
+      "flat_interface": "br100",
+      "flat_network_bridge": "br100",
+      "floating": "15.125.16.100/26",
+      "routing_source":\"$myip\",
+      "private":  "192.168.100.0/24",
+      "public_interface": "eth0",
+      "my_ip":\"$myip\"
+    }
+  },
+  "cinder": {
+    "release": "stable/grizzly",
+    "db": "mysql://cinder:stackdb@localhost/cinder"
+  },
+  "quantum": {
+    "release": "stable/grizzly",
+    "host": "127.0.0.1",
+    "ovs_db": "mysql://quantum:stackdb@localhost/ovs_quantum?charset=utf8"
+  },
+  "horizon": {
+    "release": "stable/grizzly"
+  }
+}
+EOF
+
+# install openstack
+sudo ./install-controller openstack_env.json
+sudo ./install-compute openstack_env.json
