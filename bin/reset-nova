@@ -21,7 +21,7 @@ nova-manage floating create $(os-config-applier --key nova.network.floating) --p
 
 private_net=$(os-config-applier --key nova.network.private)
 private_net_size=$(os-config-applier --key nova.network.private_size)
-nova-manage network create --label internal --fixed_range_v4 $private_net --num_networks 1 --network_size $private_net_size --multi_host=T
+nova-manage network create --label private --fixed_range_v4 $private_net --num_networks 1 --network_size $private_net_size --multi_host=T
 
 # allow ping and ssh
 nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
